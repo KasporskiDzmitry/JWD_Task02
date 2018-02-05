@@ -7,8 +7,10 @@ import by.tc.task02.entity.RentUnit;
 import by.tc.task02.entity.Shop;
 import by.tc.task02.entity.SportEquipment;
 import by.tc.task02.entity.criteria.Criteria;
-import by.tc.task02.entity.criteria.SearchCriteriaByValue;
+import by.tc.task02.main.PrintSportEquipmentInfo;
 import by.tc.task02.service.SportEquipmentService;
+import by.tc.task02.service.exception.ServiceException;
+import by.tc.task02.service.util.MapsComparator;
 import by.tc.task02.service.validation.Validator;
 
 import java.util.ArrayList;
@@ -21,11 +23,10 @@ import java.util.Map;
  */
 public class SportEquipmentServiceImpl implements SportEquipmentService {
 
+    //инициализация магазина (Shop)
     public void shopInitialization() {
-
         DAOFactory factory = DAOFactory.getInstance();
         SportEquipmentDAO sportEquipmentDAO = factory.getSportEquipmentDAO();
-
         try {
             Shop.getInstance().setGoodsMap(sportEquipmentDAO.shopInitialization());
         } catch (DAOException e) {
@@ -34,63 +35,100 @@ public class SportEquipmentServiceImpl implements SportEquipmentService {
     }
 
 
+    //поиск товара в магазине
     @Override
     public SportEquipment find(Criteria criteria) {
-
-        if (!Validator.criteriaValidator(criteria)) {
-            return null;
-        }
-
         Map<String, List<SportEquipment>> goodsMap = new HashMap<>();
         List<SportEquipment> goodsList = new ArrayList<>();
-        List<SportEquipment> rentUnits = new ArrayList<>();
+
+        try {
+            Validator.criteriaValidator(criteria);
+        } catch (ServiceException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
 
         goodsMap = Shop.getInstance().getGoodsMap();
         goodsList = goodsMap.get(criteria.getSportEquipmentType());
 
-        for (SportEquipment good : goodsList) {
-            if (compareTwoMaps(criteria, good.entityFields())) {
-                rentUnits.add(good);
-                RentUnit.getInstance().setUnits(rentUnits);
-                goodsList.remove(good);
-                return good;
-            } else {
-                continue;
+        if (goodsList != null) {
+            for (SportEquipment good : goodsList) {
+                if (MapsComparator.compareTwoMaps(criteria, good.entityParameters())) {
+                    goodsList.remove(good);
+                    RentUnit.getInstance().getUnits().add(good);
+                    return good;
+                } else {
+                    continue;
+                }
             }
         }
         return null;
     }
 
-
-
-    public <E> boolean compareTwoMaps(Criteria<E> criteria, Map<String, Object> entityFieldsMap) {
-        int numberOfMatches = 0;
-
-        for (Map.Entry<E, Object> pair : criteria.getCriteria().entrySet()) {
-            String parameterFromCriteria = String.valueOf(pair.getKey()).toLowerCase();
-            Object parameterValueFromCriteria = pair.getValue();
-            if (SearchCriteriaByValue.numberCriteria.contains(parameterFromCriteria.toUpperCase())) {
-                if (Double.parseDouble(String.valueOf(parameterValueFromCriteria)) == Double.parseDouble(String.valueOf(entityFieldsMap.get(parameterFromCriteria)))) {
-                    numberOfMatches++;
-                }
-            } else if (String.valueOf(parameterValueFromCriteria).equalsIgnoreCase(String.valueOf(entityFieldsMap.get(parameterFromCriteria)))) {
-                numberOfMatches++;
-            }
-        }
-        if (numberOfMatches == criteria.getCriteria().size()) {
-            return true;
-        } else {
-            return false;
+    public void writeRentUnitsInFile(List<SportEquipment> unitList) {
+        DAOFactory factory = DAOFactory.getInstance();
+        SportEquipmentDAO sportEquipmentDAO = factory.getSportEquipmentDAO();
+        try {
+            sportEquipmentDAO.writeRentsInFile(unitList);
+        } catch (DAOException e) {
+            System.out.println(e.getMessage());
         }
     }
 
+    public List readRentUnits() {
+        DAOFactory factory = DAOFactory.getInstance();
+        SportEquipmentDAO sportEquipmentDAO = factory.getSportEquipmentDAO();
+        try {
+            return sportEquipmentDAO.readRentsFromFile();
+        } catch (DAOException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
 
-    public void writeRentUnits(List<SportEquipment> unitList) {
+    @Override
+    public void reWriteFile(Map<String, List<SportEquipment>> goodsMap) {
         DAOFactory factory = DAOFactory.getInstance();
         SportEquipmentDAO sportEquipmentDAO = factory.getSportEquipmentDAO();
 
         try {
-            sportEquipmentDAO.unitWriter(unitList);
+            sportEquipmentDAO.reWriteFile(goodsMap);
+        } catch (DAOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void doOrder() {
+        DAOFactory factory = DAOFactory.getInstance();
+        SportEquipmentDAO sportEquipmentDAO = factory.getSportEquipmentDAO();
+
+        //перезапись файла
+        reWriteFile(Shop.getInstance().getGoodsMap());
+
+        try {
+            if (RentUnit.getInstance().getUnits().size() > 3) {
+                throw new ServiceException("Больше 3 товаров заказать нельзя!");
+            } else {
+                try {
+                    RentUnit.getInstance().getUnits().addAll(sportEquipmentDAO.readRentsFromFile());
+                } catch (DAOException e) {
+                    System.out.println(e.getMessage());
+                }
+                writeRentUnitsInFile(RentUnit.getInstance().getUnits());
+                PrintSportEquipmentInfo.printRentEquipmentInfo(RentUnit.getInstance().getUnits());
+            }
+        } catch (ServiceException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Override
+    public void returnRentUnits() {
+        DAOFactory factory = DAOFactory.getInstance();
+        SportEquipmentDAO sportEquipmentDAO = factory.getSportEquipmentDAO();
+        try {
+            sportEquipmentDAO.returnRentUnits();
+            sportEquipmentDAO.reWriteFile(Shop.getInstance().getGoodsMap());
         } catch (DAOException e) {
             System.out.println(e.getMessage());
         }

@@ -26,4 +26,23 @@ public final class Shop {
     public void setGoodsMap(Map<String, List<SportEquipment>> goodsMap) {
         this.goodsMap = goodsMap;
     }
+
+    public String goodsMapFileView() {
+        String fullText = "";
+        int count = 0;
+        for (Map.Entry<String, List<SportEquipment>> entry : goodsMap.entrySet()) {
+            count++;
+            for (int i = 0; i < entry.getValue().size(); i++) {
+                if (count == goodsMap.size() & i == entry.getValue().size()-1) {
+                    fullText += entry.getValue().get(i);
+                } else {
+                    fullText += entry.getValue().get(i) + "\n";
+                }
+            }
+            if (count != goodsMap.size()) {
+                fullText = fullText + "\n";
+            }
+        }
+        return fullText;
+    }
 }

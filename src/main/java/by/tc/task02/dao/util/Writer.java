@@ -1,48 +1,42 @@
 package by.tc.task02.dao.util;
 
 import by.tc.task02.dao.exception.DAOException;
+import by.tc.task02.dao.util.serialization_util.SerialFile;
+import by.tc.task02.dao.util.serialization_util.SerialWriter;
+import by.tc.task02.entity.Shop;
 import by.tc.task02.entity.SportEquipment;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Дима on 02.02.2018.
  */
 public class Writer {
 
-    public void writeInFile(List<SportEquipment> rentList) throws DAOException {
-
-        List fileList = new ArrayList();
-
-        try (BufferedReader bf = new BufferedReader(new InputStreamReader(new FileInputStream(".\\src\\main\\resources\\rent_units.txt")))) {
-            String line;
-            try {
-                while ((line = bf.readLine()) != null) {
-                    fileList.add(line);
-                }
-            } catch (IOException e) {
-                throw new DAOException("Ошибка при работе с файлом");
-            }
-        }catch (FileNotFoundException e) {
-            throw new DAOException("Файл не найден");
-        } catch (IOException e) {
-            throw new DAOException("Ошибка при работе с файлом");
-        }
-
-
-        try (FileWriter fileWriter = new FileWriter(".\\src\\main\\resources\\rent_units.txt")){
-            for (int i = 0; i < fileList.size(); i++) {
-                fileWriter.write(fileList.get(i) + "\n");
-            }
-            for (int i = 0; i < rentList.size(); i++) {
-                fileWriter.write(rentList.get(i) + "\n");
-            }
+    //сериализация арендованных объектов
+    public void writeRents(List<SportEquipment> rentList) throws DAOException {
+        try (SerialWriter out = new SerialWriter(SerialFile.fileRent);) {
+            out.writeObject(rentList);
         } catch (FileNotFoundException e) {
-            throw new DAOException("Файл не найден");
+            throw new DAOException("Файл 'rent_unit' не найден");
         } catch (IOException e) {
-            throw new DAOException("Ошибка при работе с файлом");
+            throw new DAOException("Ошибка при работе с файлом 'rent_units'");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    //перезапись исходного файла (в конце работы программы для последующих запусков)
+    public void reWrite(Map<String, List<SportEquipment>> goodsMap) throws DAOException {
+        try (FileWriter fileWriter = new FileWriter(".\\src\\main\\resources\\sport_equipments_db.txt")) {
+            fileWriter.write(Shop.getInstance().goodsMapFileView());
+        } catch (FileNotFoundException e) {
+            throw new DAOException("Файл 'sport_equipments_db' не найден");
+        } catch (IOException e) {
+            throw new DAOException("Ошибка при работе с файлом 'sport_equipments_db'");
         }
     }
 }

@@ -109,14 +109,14 @@ public class Jersey implements Serializable, SportEquipment {
     public String toString() {
         return
                 "Jersey : " +
-                        "LEAGUE = " + this.league + ", " +
-                        "SIZE = " + this.size + ", " +
-                        "TEAM = " + this.team + ", " +
-                        "MATERIAL = " + this.material + ", " +
-                        "PRICE = " + this.price + ";";
+                        "LEAGUE=" + this.league + ", " +
+                        "SIZE=" + this.size + ", " +
+                        "TEAM=" + this.team + ", " +
+                        "MATERIAL=" + this.material + ", " +
+                        "PRICE=" + this.price + ";";
     }
 
-    public Map<String, Object> entityFields() {
+    public Map<String, Object> entityParameters() {
         fields.put("league", this.league);
         fields.put("size", this.size);
         fields.put("team", this.team);

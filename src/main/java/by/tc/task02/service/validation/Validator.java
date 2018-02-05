@@ -2,6 +2,7 @@ package by.tc.task02.service.validation;
 
 import by.tc.task02.entity.criteria.Criteria;
 import by.tc.task02.entity.criteria.SearchCriteriaByValue;
+import by.tc.task02.service.exception.ServiceException;
 
 import java.util.Map;
 
@@ -10,7 +11,7 @@ import java.util.Map;
  */
 public class Validator {
 
-    public static <E> boolean criteriaValidator(Criteria<E> criteria) {
+    public static <E> void criteriaValidator(Criteria<E> criteria) throws ServiceException {
         for (Map.Entry<E, Object> pair : criteria.getCriteria().entrySet()) {
             E key = pair.getKey();
             Object value = pair.getValue();
@@ -19,11 +20,9 @@ public class Validator {
                 try {
                     Double.parseDouble(value.toString());
                 } catch (NumberFormatException e) {
-                    System.out.println("Неверное значение параметра " + key.toString() + ": " + value.toString());
-                    return false;
+                    throw new ServiceException("Неверное значение параметра " + key.toString() + " у объекта " + criteria.getSportEquipmentType() + ": " + value.toString());
                 }
             }
         }
-        return true;
     }
 }

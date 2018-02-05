@@ -12,7 +12,7 @@ public class Shoes implements Serializable, SportEquipment {
     private String type;
     private String color;
     private String material;
-    private short size;
+    private double size;
     private double price;
 
     private Map<String, Object> fields = new HashMap<>();
@@ -44,11 +44,11 @@ public class Shoes implements Serializable, SportEquipment {
         this.material = material;
     }
 
-    public short getSize() {
+    public double getSize() {
         return size;
     }
 
-    public void setSize(short size) {
+    public void setSize(double size) {
         this.size = size;
     }
 
@@ -102,14 +102,14 @@ public class Shoes implements Serializable, SportEquipment {
     public String toString() {
         return
                 "Shoes : "  +
-                        "TYPE = " + this.type + ", " +
-                        "SIZE = " + this.size + ", " +
-                        "COLOR = " + this.color + ", " +
-                        "MATERIAL = " + this.material + ", " +
-                        "PRICE = " + this.price + ";";
+                        "TYPE=" + this.type + ", " +
+                        "SIZE=" + this.size + ", " +
+                        "COLOR=" + this.color + ", " +
+                        "MATERIAL=" + this.material + ", " +
+                        "PRICE=" + this.price + ";";
     }
 
-    public Map<String, Object> entityFields() {
+    public Map<String, Object> entityParameters() {
         fields.put("type", this.type);
         fields.put("size", this.size);
         fields.put("color", this.color);

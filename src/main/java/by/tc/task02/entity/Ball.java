@@ -111,7 +111,7 @@ public class Ball implements Serializable, SportEquipment {
                         "PRICE=" + this.price + ";";
     }
 
-    public Map<String, Object> entityFields() {
+    public Map<String, Object> entityParameters() {
         fields.put("type", this.type);
         fields.put("size", this.size);
         fields.put("color", this.color);

@@ -2,7 +2,6 @@ package by.tc.task02.dao;
 
 import by.tc.task02.dao.exception.DAOException;
 import by.tc.task02.entity.SportEquipment;
-import by.tc.task02.entity.criteria.Criteria;
 
 import java.util.List;
 import java.util.Map;
@@ -13,6 +12,8 @@ import java.util.Map;
 public interface SportEquipmentDAO {
 
     Map<String, List<SportEquipment>> shopInitialization() throws DAOException;
-
-    void unitWriter(List<SportEquipment> rentList) throws DAOException;
+    void writeRentsInFile(List<SportEquipment> rentList) throws DAOException;
+    void reWriteFile(Map<String, List<SportEquipment>> goodsMap) throws DAOException;
+    List readRentsFromFile() throws DAOException;
+    void returnRentUnits() throws DAOException;
 }

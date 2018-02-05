@@ -1,7 +1,5 @@
 package by.tc.task02.dao.util;
 
-import by.tc.task02.entity.criteria.Criteria;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;

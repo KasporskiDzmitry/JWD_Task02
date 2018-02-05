@@ -23,7 +23,7 @@ public class ShoesCreator implements CommandDAO {
         shoes.setType(String.valueOf(mapFromDB.get("TYPE")));
         shoes.setColor(String.valueOf(mapFromDB.get("COLOR")));
         shoes.setMaterial(String.valueOf(mapFromDB.get("MATERIAL")));
-        shoes.setSize(Short.parseShort(String.valueOf(mapFromDB.get("SIZE"))));
+        shoes.setSize(Double.parseDouble(String.valueOf(mapFromDB.get("SIZE"))));
         shoes.setPrice(Double.parseDouble(String.valueOf(mapFromDB.get("PRICE"))));
 
         return shoes;

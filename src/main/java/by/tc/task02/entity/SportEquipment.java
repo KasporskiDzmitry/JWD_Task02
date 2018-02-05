@@ -7,5 +7,5 @@ import java.util.Map;
  */
 public interface SportEquipment {
 
-    Map<String,Object> entityFields();
+    Map<String,Object> entityParameters();
 }
